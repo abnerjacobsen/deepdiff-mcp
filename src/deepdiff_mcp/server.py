@@ -21,6 +21,7 @@ class DeepDiffMCP:
     def _register_tools(self):
         """Register all available DeepDiff tools."""
         # DeepDiff tools
+        self.mcp.tool(self.compare_files)
         self.mcp.tool(self.compare)
         self.mcp.tool(self.get_deep_distance)
         
@@ -373,3 +374,75 @@ class DeepDiffMCP:
 def create_server(name: str = "DeepDiff MCP") -> DeepDiffMCP:
     """Create a new DeepDiff MCP server."""
     return DeepDiffMCP(name)
+
+    def compare_files(
+        self,
+        file1_path: str,
+        file2_path: str,
+        ignore_order: bool = False,
+        report_repetition: bool = False,
+        exclude_paths: Optional[List[str]] = None,
+        exclude_regex_paths: Optional[List[str]] = None,
+        ignore_string_type_changes: bool = False,
+        ignore_numeric_type_changes: bool = True,  # Default True for file comparisons
+        ignore_string_case: bool = False,
+        significant_digits: Optional[int] = None,
+        ctx: Optional[Context] = None,
+    ) -> Dict:
+        """
+        Compare two files (CSV, Excel, or JSON) and return their differences.
+        
+        Args:
+            file1_path: Path to the first file
+            file2_path: Path to the second file
+            ignore_order: Whether to ignore order in iterables
+            report_repetition: Whether to report repetitions when ignore_order=True
+            exclude_paths: Paths to exclude from comparison
+            exclude_regex_paths: Regex paths to exclude from comparison
+            ignore_string_type_changes: Whether to ignore string type changes
+            ignore_numeric_type_changes: Whether to ignore numeric type changes (default: True for files)
+            ignore_string_case: Whether to ignore string case
+            significant_digits: Number of significant digits to consider for float comparison
+            ctx: MCP context
+            
+        Returns:
+            Dictionary containing the differences
+        """
+        from .file_utils import load_data_from_file
+        
+        if ctx:
+            ctx.info(f"Loading data from {file1_path}...")
+            
+        try:
+            t1 = load_data_from_file(file1_path)
+        except Exception as e:
+            if ctx:
+                ctx.error(f"Error loading {file1_path}: {str(e)}")
+            raise ValueError(f"Error loading {file1_path}: {str(e)}")
+            
+        if ctx:
+            ctx.info(f"Loading data from {file2_path}...")
+            
+        try:
+            t2 = load_data_from_file(file2_path)
+        except Exception as e:
+            if ctx:
+                ctx.error(f"Error loading {file2_path}: {str(e)}")
+            raise ValueError(f"Error loading {file2_path}: {str(e)}")
+        
+        if ctx:
+            ctx.info("Comparing files...")
+            
+        return self.compare(
+            t1=t1,
+            t2=t2,
+            ignore_order=ignore_order,
+            report_repetition=report_repetition,
+            exclude_paths=exclude_paths,
+            exclude_regex_paths=exclude_regex_paths,
+            ignore_string_type_changes=ignore_string_type_changes,
+            ignore_numeric_type_changes=ignore_numeric_type_changes,
+            ignore_string_case=ignore_string_case,
+            significant_digits=significant_digits,
+            ctx=ctx,
+        )
