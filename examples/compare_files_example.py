@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 from fastmcp import Client
+from fastmcp.client.transports import StdioTransport
 
 # Create sample CSV files for demonstration
 def create_sample_files():
@@ -47,9 +48,12 @@ async def main():
     # Path to the server script (adjust as needed)
     server_script = os.path.join(os.path.dirname(__file__), "server_example.py")
     
-    # Create an MCP client to connect to our server
+    # Create an MCP client to connect to our server - Using explicit StdioTransport
     print("Connecting to DeepDiff MCP server...")
-    async with Client(f"python {server_script}") as client:
+    
+    # Método 1: Especificando explicitamente o transporte
+    transport = StdioTransport(command="python", args=[server_script])
+    async with Client(transport=transport) as client:
         # List available tools
         tools = await client.list_tools()
         print(f"Available tools: {[tool.name for tool in tools]}")
