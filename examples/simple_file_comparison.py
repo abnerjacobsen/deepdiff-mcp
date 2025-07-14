@@ -9,8 +9,8 @@ from fastmcp.client.transports import StdioTransport
 
 async def compare_files(file1_path, file2_path):
     """Compare two files using DeepDiff MCP."""
-    # Use explicit transport configuration for reliability
-    transport = StdioTransport(command="deepdiff-mcp")
+    # Use explicit transport configuration with empty args list
+    transport = StdioTransport(command="deepdiff-mcp", args=[])
     
     async with Client(transport=transport) as client:
         print(f"Comparing {file1_path} and {file2_path}...")
