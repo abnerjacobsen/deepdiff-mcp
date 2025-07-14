@@ -83,3 +83,53 @@ async def test_extract_path(client):
     result = await client.call_tool("extract_path", {"obj": obj, "path": "root['a']['b'][3]['c']"})
     
     assert result.text == "value"
+
+@pytest.mark.asyncio
+async def test_compare_files(client, tmp_path):
+    """Test comparing files."""
+    import os
+    import pandas as pd
+    
+    # Create test files
+    file1_path = os.path.join(tmp_path, "test1.csv")
+    file2_path = os.path.join(tmp_path, "test2.csv")
+    
+    # Create sample DataFrames
+    df1 = pd.DataFrame({
+        "id": [1, 2, 3],
+        "name": ["Alice", "Bob", "Charlie"],
+        "age": [25, 30, 35]
+    })
+    
+    df2 = pd.DataFrame({
+        "id": [1, 2, 3],
+        "name": ["Alice", "Bob", "Charlie"],
+        "age": [25, 31, 35]  # Changed age for Bob
+    })
+    
+    # Save to CSV
+    df1.to_csv(file1_path, index=False)
+    df2.to_csv(file2_path, index=False)
+    
+    # Test comparison
+    result = await client.call_tool("compare_files", {
+        "file1_path": file1_path,
+        "file2_path": file2_path
+    })
+    
+    diff = result.json()
+    
+    # We should have a difference in Bob's age
+    assert "values_changed" in diff
+    age_changes = [k for k in diff["values_changed"].keys() if "'age'" in k]
+    assert len(age_changes) > 0
+    
+    # Check if one of the changes is Bob's age (value 30 -> 31)
+    found_change = False
+    for key in age_changes:
+        change = diff["values_changed"][key]
+        if change["old_value"] == 30 and change["new_value"] == 31:
+            found_change = True
+            break
+    
+    assert found_change, "Could not find the expected change in Bob's age"

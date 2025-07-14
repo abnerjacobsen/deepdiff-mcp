@@ -80,6 +80,8 @@ if __name__ == "__main__":
 ```
 
 ## Available Tools
+- `compare_files` - Compare two CSV, Excel, or JSON files directly
+
 
 The DeepDiff MCP server provides the following tools:
 
@@ -97,3 +99,42 @@ The DeepDiff MCP server provides the following tools:
 For more information about DeepDiff, see the [DeepDiff documentation](https://zepworks.com/deepdiff/current/).
 
 For more information about MCP and FastMCP, see the [Model Context Protocol](https://modelcontextprotocol.io/) and [FastMCP documentation](https://gofastmcp.com/).
+
+## Comparando Arquivos CSV e Excel
+
+O DeepDiff MCP suporta comparação direta de arquivos CSV, Excel e JSON:
+
+```python
+import asyncio
+from fastmcp import Client
+
+async def main():
+    async with Client("deepdiff-mcp") as client:
+        # Compare dois arquivos CSV
+        result = await client.call_tool(
+            "compare_files", 
+            {
+                "file1_path": "caminho/para/arquivo1.csv", 
+                "file2_path": "caminho/para/arquivo2.csv",
+                "ignore_order": True  # Ignorar a ordem das linhas
+            }
+        )
+        
+        print(f"Diferenças: {result.text}")
+        
+        # Compare arquivos Excel
+        excel_result = await client.call_tool(
+            "compare_files", 
+            {
+                "file1_path": "caminho/para/arquivo1.xlsx", 
+                "file2_path": "caminho/para/arquivo2.xlsx"
+            }
+        )
+        
+        print(f"Diferenças: {excel_result.text}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Esta funcionalidade é especialmente útil para análise de dados e verificação de integridade de dados em pipelines.
