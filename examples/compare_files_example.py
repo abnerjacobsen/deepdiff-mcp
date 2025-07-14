@@ -51,7 +51,7 @@ async def main():
     # Create an MCP client to connect to our server - Using explicit StdioTransport
     print("Connecting to DeepDiff MCP server...")
     
-    # Método 1: Especificando explicitamente o transporte
+    # Método 1: Especificando explicitamente o transporte com args como lista
     transport = StdioTransport(command="python", args=[server_script])
     async with Client(transport=transport) as client:
         # List available tools
