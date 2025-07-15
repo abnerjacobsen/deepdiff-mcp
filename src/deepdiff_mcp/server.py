@@ -21,9 +21,9 @@ class DeepDiffMCP:
     def _register_tools(self):
         """Register all available DeepDiff tools."""
         # DeepDiff tools
-        self.mcp.tool(self.compare_files)
         self.mcp.tool(self.compare)
         self.mcp.tool(self.get_deep_distance)
+        self.mcp.tool(self.compare_files)  # Registrar o método compare_files
         
         # DeepSearch tools
         self.mcp.tool(self.search)
@@ -369,12 +369,7 @@ class DeepDiffMCP:
             ctx.info("Extraction completed")
             
         return result
-
-
-def create_server(name: str = "DeepDiff MCP") -> DeepDiffMCP:
-    """Create a new DeepDiff MCP server."""
-    return DeepDiffMCP(name)
-
+        
     def compare_files(
         self,
         file1_path: str,
@@ -446,3 +441,8 @@ def create_server(name: str = "DeepDiff MCP") -> DeepDiffMCP:
             significant_digits=significant_digits,
             ctx=ctx,
         )
+
+
+def create_server(name: str = "DeepDiff MCP") -> DeepDiffMCP:
+    """Create a new DeepDiff MCP server."""
+    return DeepDiffMCP(name)
