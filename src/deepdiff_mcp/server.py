@@ -126,7 +126,14 @@ class DeepDiffMCP:
         t2: Any,
         ignore_order: bool = False,
         ctx: Optional[Context] = None,
-        **kwargs
+        report_repetition: bool = False,
+        exclude_paths: Optional[List[str]] = None,
+        exclude_regex_paths: Optional[List[str]] = None,
+        exclude_types: Optional[List[str]] = None,
+        ignore_string_type_changes: bool = False,
+        ignore_numeric_type_changes: bool = False,
+        ignore_string_case: bool = False,
+        significant_digits: Optional[int] = None
     ) -> float:
         """
         Get the deep distance between two objects.
@@ -136,7 +143,6 @@ class DeepDiffMCP:
             t2: Second object
             ignore_order: Whether to ignore order in iterables
             ctx: MCP context
-            **kwargs: Additional arguments for DeepDiff
             
         Returns:
             Float representing the deep distance (between 0 and 1)
@@ -144,7 +150,14 @@ class DeepDiffMCP:
         if ctx:
             ctx.info("Calculating deep distance...")
             
-        diff = DeepDiff(t1=t1, t2=t2, ignore_order=ignore_order, **kwargs)
+        diff = DeepDiff(t1=t1, t2=t2, ignore_order=ignore_order, report_repetition=report_repetition,
+            exclude_paths=exclude_paths,
+            exclude_regex_paths=exclude_regex_paths,
+            exclude_types=exclude_types,
+            ignore_string_type_changes=ignore_string_type_changes,
+            ignore_numeric_type_changes=ignore_numeric_type_changes,
+            ignore_string_case=ignore_string_case,
+            significant_digits=significant_digits)
         distance = diff.get_deep_distance()
         
         if ctx:
@@ -292,7 +305,15 @@ class DeepDiffMCP:
         t1: Any,
         t2: Any,
         ctx: Optional[Context] = None,
-        **kwargs
+        ignore_order: bool = False,
+        report_repetition: bool = False,
+        exclude_paths: Optional[List[str]] = None,
+        exclude_regex_paths: Optional[List[str]] = None,
+        exclude_types: Optional[List[str]] = None,
+        ignore_string_type_changes: bool = False,
+        ignore_numeric_type_changes: bool = False,
+        ignore_string_case: bool = False,
+        significant_digits: Optional[int] = None
     ) -> Dict:
         """
         Create a delta that can be used to transform t1 into t2.
@@ -301,7 +322,6 @@ class DeepDiffMCP:
             t1: Source object
             t2: Target object
             ctx: MCP context
-            **kwargs: Additional arguments for DeepDiff
             
         Returns:
             Serializable delta representation
@@ -309,7 +329,15 @@ class DeepDiffMCP:
         if ctx:
             ctx.info("Creating delta...")
             
-        diff = DeepDiff(t1=t1, t2=t2, **kwargs)
+        diff = DeepDiff(t1=t1, t2=t2, ignore_order=ignore_order,
+            report_repetition=report_repetition,
+            exclude_paths=exclude_paths,
+            exclude_regex_paths=exclude_regex_paths,
+            exclude_types=exclude_types,
+            ignore_string_type_changes=ignore_string_type_changes,
+            ignore_numeric_type_changes=ignore_numeric_type_changes,
+            ignore_string_case=ignore_string_case,
+            significant_digits=significant_digits)
         delta = Delta(diff)
         
         # Convert to a serializable format
