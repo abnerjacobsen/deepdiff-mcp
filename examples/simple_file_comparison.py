@@ -4,6 +4,7 @@ Usage: python simple_file_comparison.py file1.csv file2.csv
 """
 import asyncio
 import sys
+import json
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
@@ -26,7 +27,8 @@ async def compare_files(file1_path, file2_path):
         )
         
         print("\nDifferences:")
-        print(result.text)
+        # Access the result data
+        print(result)
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
